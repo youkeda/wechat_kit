@@ -48,6 +48,7 @@ static NSString *const METHOD_LAUNCHMINIPROGRAM = @"launchMiniProgram";
 static NSString *const METHOD_PAY = @"pay";
 #endif
 
+static NSString *const METHOD_ONLAUNCH = @"onLaunch";
 static NSString *const METHOD_ONAUTHRESP = @"onAuthResp";
 static NSString *const METHOD_ONOPENURLRESP = @"onOpenUrlResp";
 static NSString *const METHOD_ONSHAREMSGRESP = @"onShareMsgResp";
@@ -411,6 +412,13 @@ static NSString *const ARGUMENT_KEY_RESULT_AUTHCODE = @"authCode";
 #pragma mark - WXApiDelegate
 
 - (void)onReq:(BaseReq *)req {
+     //获取开放标签传递的extinfo数据逻辑
+	if ([req isKindOfClass:[LaunchFromWXReq class]]) {
+		WXMediaMessage *msg = req.message;
+		NSString *openID = req.openID;
+		NSString *extinfo = req.msg.messageExt;
+        [_channel invokeMethod:METHOD_ONLAUNCH arguments:extinfo];
+	}
 }
 
 - (void)onResp:(BaseResp *)resp {
