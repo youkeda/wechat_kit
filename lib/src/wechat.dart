@@ -49,6 +49,7 @@ class Wechat {
   static const String _METHOD_LAUNCHMINIPROGRAM = 'launchMiniProgram';
   static const String _METHOD_PAY = 'pay';
 
+  static const String _METHOD_ONLAUNCH = 'onLaunch';
   static const String _METHOD_ONAUTHRESP = 'onAuthResp';
   static const String _METHOD_ONOPENURLRESP = 'onOpenUrlResp';
   static const String _METHOD_ONSHAREMSGRESP = 'onShareMsgResp';
@@ -135,6 +136,9 @@ class Wechat {
   final StreamController<String> _authQrcodeScannedRespStreamController =
       StreamController<String>.broadcast();
 
+  final StreamController<String> _launchRespStreamController =
+      StreamController<String>.broadcast();
+
   final StreamController<WechatQrauthResp> _authFinishRespStreamController =
       StreamController<WechatQrauthResp>.broadcast();
 
@@ -156,6 +160,9 @@ class Wechat {
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
+      case _METHOD_ONLAUNCH:
+        _launchRespStreamController.add(call.arguments as String);
+        break;
       case _METHOD_ONAUTHRESP:
         _authRespStreamController.add(WechatAuthResp.fromJson(
             (call.arguments as Map<dynamic, dynamic>).cast<String, dynamic>()));
@@ -194,6 +201,11 @@ class Wechat {
             (call.arguments as Map<dynamic, dynamic>).cast<String, dynamic>()));
         break;
     }
+  }
+
+  /// 开启App
+  Stream<String> launch() {
+    return _launchRespStreamController.stream;
   }
 
   /// 登录
