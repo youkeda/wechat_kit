@@ -39,6 +39,8 @@ import com.tencent.mm.opensdk.modelpay.PayResp;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.tencent.mm.opensdk.constants.ConstantsAPI;
+import com.tencent.mm.opensdk.modelmsg.ShowMessageFromWX;
 
 import java.io.File;
 import java.util.HashMap;
@@ -76,6 +78,7 @@ public class WechatKit implements MethodChannel.MethodCallHandler, PluginRegistr
     private static final String METHOD_LAUNCHMINIPROGRAM = "launchMiniProgram";
     private static final String METHOD_PAY = "pay";
 
+    private static final String METHOD_ONLAUNCH = "onLaunch";
     private static final String METHOD_ONAUTHRESP = "onAuthResp";
     private static final String METHOD_ONOPENURLRESP = "onOpenUrlResp";
     private static final String METHOD_ONSHAREMSGRESP = "onShareMsgResp";
@@ -195,7 +198,16 @@ public class WechatKit implements MethodChannel.MethodCallHandler, PluginRegistr
     private IWXAPIEventHandler iwxapiEventHandler = new IWXAPIEventHandler() {
         @Override
         public void onReq(BaseReq req) {
-
+            switch (req.getType()) {
+                case ConstantsAPI.COMMAND_SHOWMESSAGE_FROM_WX:
+                    ShowMessageFromWX.Req showReq = (ShowMessageFromWX.Req) req;
+                    WXMediaMessage mediaMsg = showReq.message;
+                    String extInfo = mediaMsg.messageExt;
+                    channel.invokeMethod(METHOD_ONLAUNCH, extInfo);
+                    break;
+                default:
+                    break;
+            }
         }
 
         @Override
